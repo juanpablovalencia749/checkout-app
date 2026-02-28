@@ -1,6 +1,6 @@
 import React from 'react';
+import { Loader2, PackageSearch } from 'lucide-react';
 import { ProductCard } from './ProductCard';
-import { LoadingSpinner } from '../common/LoadingSpinner';
 import { ErrorMessage } from '../common/ErrorMessage';
 import type { Product } from '../../types';
 
@@ -19,49 +19,58 @@ export const ProductList: React.FC<ProductListProps> = ({
   onSelectProduct,
   onRetry,
 }) => {
+
+  /* =========================
+     LOADING STATE
+  ========================== */
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <LoadingSpinner size="lg" />
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+        <p className="text-gray-600 text-sm">Loading products...</p>
       </div>
     );
   }
 
+  /* =========================
+     ERROR STATE
+  ========================== */
   if (error) {
     return (
-      <div className="max-w-md mx-auto mt-8">
+      <div className="max-w-md mx-auto mt-12">
         <ErrorMessage message={error} onRetry={onRetry} />
       </div>
     );
   }
 
-  if (products?.length === 0) {
+  /* =========================
+     EMPTY STATE
+  ========================== */
+  if (!products || products.length === 0) {
     return (
-      <div className="text-center py-12">
-        <svg
-          className="mx-auto h-12 w-12 text-gray-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-          />
-        </svg>
-        <h3 className="mt-2 text-sm font-medium text-gray-900">No products available</h3>
-        <p className="mt-1 text-sm text-gray-500">
-          Check back later for new products.
+      <div className="flex flex-col items-center justify-center text-center py-16">
+        <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-6">
+          <PackageSearch className="w-10 h-10 text-gray-400" />
+        </div>
+
+        <h3 className="text-lg font-semibold text-gray-900">
+          No products available
+        </h3>
+
+        <p className="mt-2 text-sm text-gray-500 max-w-sm">
+          We couldn't find any products right now.  
+          Please check back later.
         </p>
       </div>
     );
   }
 
+  /* =========================
+     PRODUCTS GRID
+  ========================== */
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-      {products?.map((product) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {products.map((product) => (
         <ProductCard
           key={product.id}
           product={product}

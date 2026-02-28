@@ -30,11 +30,13 @@ type CreditCardFormData = z.infer<typeof creditCardFormSchema>;
 interface CreditCardFormProps {
   onSubmit: (data: CreditCard) => void;
   defaultValues?: Partial<CreditCard>;
+    disabled?: boolean;
 }
 
 export const CreditCardForm: React.FC<CreditCardFormProps> = ({ 
   onSubmit,
   defaultValues,
+  disabled
 }) => {
   const [cardBrand, setCardBrand] = useState<CardBrand>('unknown');
   const [formattedNumber, setFormattedNumber] = useState('');
@@ -90,7 +92,7 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({
           <input
             id="cardNumber"
             type="text"
-            maxLength={16}
+            maxLength={19}
             placeholder="4242424242424242"
             {...register('cardNumber')}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${

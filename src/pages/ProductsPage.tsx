@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Check, X, Loader2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { fetchProducts, setSelectedProduct } from '../features/products/productsSlice';
 import { 
@@ -50,12 +51,10 @@ export const ProductsPage: React.FC = () => {
   ) => {
     if (!checkout.selectedProduct) return;
 
-    // Save data to checkout state
     dispatch(setCustomerInfo(customer));
     dispatch(setDeliveryInfo(delivery));
     dispatch(setCardInfo(card));
     
-    // Close modal and open backdrop
     dispatch(closeModal());
     dispatch(setCurrentStep(CHECKOUT_STEPS.SUMMARY));
     dispatch(openBackdrop());
@@ -69,11 +68,9 @@ export const ProductsPage: React.FC = () => {
     try {
       dispatch(setCurrentStep(CHECKOUT_STEPS.STATUS));
       
-      // Calculate total amount
       const subtotal = checkout.selectedProduct.price * checkout.quantity;
       const total = subtotal + BASE_FEE + DELIVERY_FEE;
 
-      // Step 1: Create transaction
       const createResult = await dispatch(
         createTransaction({
           productId: checkout.selectedProduct.id,
@@ -88,7 +85,6 @@ export const ProductsPage: React.FC = () => {
       if (createResult && createResult.id) {
         dispatch(setTransactionId(createResult.id));
 
-        // Step 2: Process payment
         const processResult = await dispatch(
           processPayment({
             transactionId: createResult.id,
@@ -105,14 +101,12 @@ export const ProductsPage: React.FC = () => {
           })
         ).unwrap();
 
-        // Navigate to status page
         if (processResult) {
           setNavigatingToStatus(true);
-          // Wait a bit to show the result, then navigate
+
           setTimeout(() => {
             dispatch(closeBackdrop());
             dispatch(setCurrentStep(CHECKOUT_STEPS.COMPLETE));
-            // Reload products to get updated stock
             dispatch(fetchProducts());
           }, 2000);
         }
@@ -138,73 +132,57 @@ export const ProductsPage: React.FC = () => {
     dispatch(fetchProducts());
   };
 
-  // Show transaction status page
+  /* ==============================
+     STATUS PAGE
+  ============================== */
+
   if (checkout.currentStep === CHECKOUT_STEPS.COMPLETE && currentTransaction) {
+    const isApproved = currentTransaction.status === 'APPROVED';
+
     return (
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+
           {/* Status Icon */}
           <div className="flex justify-center mb-6">
-            {currentTransaction.status === 'APPROVED' ? (
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-            ) : (
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-8 h-8 text-red-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </div>
-            )}
+            <div
+              className={`w-20 h-20 rounded-full flex items-center justify-center ${
+                isApproved ? 'bg-green-100' : 'bg-red-100'
+              }`}
+            >
+              {isApproved ? (
+                <Check className="w-10 h-10 text-green-600" />
+              ) : (
+                <X className="w-10 h-10 text-red-600" />
+              )}
+            </div>
           </div>
 
           {/* Status Message */}
           <h2 className="text-2xl font-bold text-center mb-2">
-            {currentTransaction.status === 'APPROVED'
-              ? 'Payment Successful!'
-              : 'Payment Failed'}
+            {isApproved ? 'Payment Successful!' : 'Payment Failed'}
           </h2>
+
           <p className="text-center text-gray-600 mb-6">
-            {currentTransaction.status === 'APPROVED'
+            {isApproved
               ? 'Your order has been confirmed and will be delivered soon.'
               : 'There was an issue processing your payment. Please try again.'}
           </p>
 
           {/* Transaction Details */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6 space-y-2 text-sm">
+          <div className="bg-gray-50 rounded-xl p-4 mb-6 space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Transaction ID:</span>
-              <span className="font-mono text-gray-900">{currentTransaction.reference}</span>
+              <span className="font-mono text-gray-900">
+                {currentTransaction.reference}
+              </span>
             </div>
+
             <div className="flex justify-between">
               <span className="text-gray-600">Status:</span>
               <span
                 className={`font-semibold ${
-                  currentTransaction.status === 'APPROVED'
-                    ? 'text-green-600'
-                    : 'text-red-600'
+                  isApproved ? 'text-green-600' : 'text-red-600'
                 }`}
               >
                 {currentTransaction.status}
@@ -219,7 +197,7 @@ export const ProductsPage: React.FC = () => {
               dispatch(clearTransaction());
               dispatch(fetchProducts());
             }}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            className="w-full bg-blue-600 text-white py-3 px-4 rounded-xl font-medium hover:bg-blue-700 transition-colors"
           >
             Continue Shopping
           </button>
@@ -227,9 +205,11 @@ export const ProductsPage: React.FC = () => {
       </div>
     );
   }
-  console.log("products", products)
-console.log(loading)
-console.log(error)
+
+  /* ==============================
+     PRODUCTS LIST
+  ============================== */
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
@@ -238,6 +218,12 @@ console.log(error)
           Browse our selection of quality products
         </p>
       </div>
+
+      {loading && (
+        <div className="flex justify-center py-12">
+          <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+        </div>
+      )}
 
       <ProductList
         products={products}
