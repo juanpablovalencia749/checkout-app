@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { fetchTransactionById } from '../features/transaction/transactionSlice';
 import { CHECKOUT_STEPS } from '../constants';
 
-const SSE_BASE = 'http://localhost:3000/transactions'; // ajusta si tu base es otra
+const SSE_BASE = 'http://localhost:3000/transactions'; 
 
 export const TransactionSSEManager: React.FC = () => {
   const dispatch = useAppDispatch();

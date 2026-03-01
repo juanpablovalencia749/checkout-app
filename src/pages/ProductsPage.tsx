@@ -1,6 +1,8 @@
 // src/pages/ProductsPage.tsx
 import React, { useEffect, useState } from 'react';
 import { Check, X, Loader2 } from 'lucide-react';
+import { Card } from '../components/ui/card';
+import { Button } from '../components/ui/button';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { fetchProducts } from '../features/products/productsSlice';
 import {
@@ -10,9 +12,6 @@ import {
   closeModal,
   openBackdrop,
   closeBackdrop,
-  setCustomerInfo,
-  setDeliveryInfo,
-  setCardInfo,
   setTransactionId,
   resetCheckout,
   setSelectedProduct as setCheckoutSelectedProduct,
@@ -36,14 +35,11 @@ export const ProductsPage: React.FC = () => {
   const [navigatingToStatus, setNavigatingToStatus] = useState(false);
 
   useEffect(() => {
-    // NUEVO: Verificamos si hay una transacción en curso persistida en localStorage (F5 / Reload)
     const pendingTx = localStorage.getItem('wompi_pending_tx');
     
     if (pendingTx) {
-      // Fuerza a abrir el modal para recuperar la sesión y que se conecte al SSE
       dispatch(openModal());
     } else {
-      // Lógica original de Redux (si no hubo recarga dura pero sí estado guardado en el store)
       const txId = checkout.transactionId;
       const step = checkout.currentStep;
       if (txId && step >= CHECKOUT_STEPS.SUMMARY) {
@@ -53,18 +49,15 @@ export const ProductsPage: React.FC = () => {
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  // Seleccionar producto desde la lista — ahora guarda en checkout slice
   const handleSelectProduct = (product: Product, quantityParam: number = 1) => {
     console.log('[ProductsPage] handleSelectProduct called with', product.id, quantityParam);
 
-    // normalizar id por si acaso
     const normalizedId =
       (product as any).id ??
       (product as any)._id ??
@@ -83,40 +76,13 @@ export const ProductsPage: React.FC = () => {
       id: normalizedId,
     } as Product;
 
-    // Guardar en checkout slice (flujo de compra)
     dispatch(setCheckoutSelectedProduct(normalizedProduct));
     dispatch(setQuantity(quantityParam));
 
-    // Avanzar al paso de payment info y abrir modal
     dispatch(setCurrentStep(CHECKOUT_STEPS.PAYMENT_INFO));
     dispatch(openModal());
   };
 
-  // const handlePaymentModalComplete = async (
-  //   customerOrTxId: any, // Adaptado por si recibe los datos del nuevo modal SSE o del antiguo
-  //   delivery?: DeliveryInfo,
-  //   card?: CreditCard
-  // ) => {
-  //   if (!checkout.selectedProduct) return;
-
-  //   // Si viene del Modal unificado (recuperación de SSE), cerramos todo.
-  //   if (typeof customerOrTxId === 'string') {
-  //     dispatch(closeModal());
-  //     dispatch(closeBackdrop());
-  //     // Aquí podrías forzar la navegación final a CHECKOUT_STEPS.COMPLETE si lo deseas
-  //     return;
-  //   }
-
-  //   // Lógica original
-  //   dispatch(setCustomerInfo(customerOrTxId));
-  //   dispatch(setDeliveryInfo(delivery!));
-  //   dispatch(setCardInfo(card!));
-
-  //   dispatch(closeModal());
-  //   dispatch(setCurrentStep(CHECKOUT_STEPS.SUMMARY));
-  //   dispatch(openBackdrop());
-  // };
-// src/pages/ProductsPage.tsx
 
 const handlePaymentModalComplete = async (
   txId: string,
@@ -124,18 +90,14 @@ const handlePaymentModalComplete = async (
 ) => {
   console.log("Transacción terminada:", txId, status);
   
-  // Limpiamos estados de Redux si es necesario
   dispatch(closeModal());
   dispatch(closeBackdrop());
 
   if (status === 'APPROVED') {
-    // Actualizamos el stock de los productos
     dispatch(fetchProducts());
-    // Opcional: Podrías redirigir a una página de "Gracias" o simplemente 
-    // resetear el checkout.
+
     dispatch(resetCheckout());
   } else {
-    // Manejar error si se desea
     console.warn("El pago no fue aprobado");
   }
 };
@@ -164,7 +126,6 @@ const handlePaymentModalComplete = async (
       if (createResult && createResult.id) {
         dispatch(setTransactionId(createResult.id));
         
-        // Antes de procesar, guardamos en localStorage para el SSE!
         localStorage.setItem('wompi_pending_tx', createResult.id);
 
         const processResult = await dispatch(
@@ -206,9 +167,6 @@ const handlePaymentModalComplete = async (
     dispatch(openModal());
   };
 
-  const handleCloseModal = () => {
-    dispatch(closeModal());
-  };
 
   const handleRetryFetch = () => {
     dispatch(fetchProducts());
@@ -223,7 +181,7 @@ const handlePaymentModalComplete = async (
 
     return (
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+        <Card className="p-6 sm:p-8">
           <div className="flex justify-center mb-6">
             <div
               className={`w-20 h-20 rounded-full flex items-center justify-center ${
@@ -266,17 +224,18 @@ const handlePaymentModalComplete = async (
             </div>
           </div>
 
-          <button
+          <Button
             onClick={() => {
               dispatch(resetCheckout());
               dispatch(clearTransaction());
               dispatch(fetchProducts());
             }}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-xl font-medium hover:bg-blue-700 transition-colors"
+            className="w-full"
+            size="lg"
           >
             Continue Shopping
-          </button>
-        </div>
+          </Button>
+        </Card>
       </div>
     );
   }
@@ -308,20 +267,6 @@ const handlePaymentModalComplete = async (
         onRetry={handleRetryFetch}
       />
 
-      {/* <PaymentModal
-        isOpen={checkout.isModalOpen}
-        onClose={handleCloseModal}
-        onComplete={handlePaymentModalComplete}
-        defaultValues={{
-          customer: checkout.customerInfo,
-          delivery: checkout.deliveryInfo,
-          card: checkout.cardInfo,
-        }}
-        productId={checkout.selectedProduct?.id ?? undefined}
-        productTitle={checkout.selectedProduct?.name ?? undefined}
-        amount={checkout.selectedProduct?.price ?? undefined}
-        quantity={checkout.quantity}
-      /> */}
 
       <PaymentModal
   isOpen={checkout.isModalOpen}

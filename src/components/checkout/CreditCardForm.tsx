@@ -6,6 +6,11 @@ import { CardBrandDetector } from './CardBrandDetector';
 import { detectCardBrand, formatCardNumber } from '../../lib/utils';
 import type { CardBrand, CreditCard } from '../../types';
 
+// ui components
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Button } from '../ui/button';
+
 const creditCardFormSchema = z.object({
   cardNumber: z
     .string()
@@ -82,22 +87,18 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       {/* Card Number */}
       <div>
-        <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 mb-1">
-          Card Number
-        </label>
+        <Label htmlFor="cardNumber">Card Number</Label>
         <div className="relative">
-          <input
+          <Input
             id="cardNumber"
             type="text"
             maxLength={19}
-            placeholder="4242424242424242"
+            placeholder="4242 4242 4242 4242"
             {...register('cardNumber')}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              errors.cardNumber ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={errors.cardNumber ? 'border-red-500' : ''}
           />
           {cardBrand !== 'unknown' && (
             <div className="absolute right-2 top-2">
@@ -116,18 +117,14 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({
       {/* Expiration Date and CVV */}
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <label htmlFor="expMonth" className="block text-sm font-medium text-gray-700 mb-1">
-            Month
-          </label>
-          <input
+          <Label htmlFor="expMonth">Month</Label>
+          <Input
             id="expMonth"
             type="text"
             maxLength={2}
             placeholder="MM"
             {...register('expMonth')}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              errors.expMonth ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={errors.expMonth ? 'border-red-500' : ''}
           />
           {errors.expMonth && (
             <p className="mt-1 text-sm text-red-600">{errors.expMonth.message}</p>
@@ -135,18 +132,14 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({
         </div>
 
         <div>
-          <label htmlFor="expYear" className="block text-sm font-medium text-gray-700 mb-1">
-            Year
-          </label>
-          <input
+          <Label htmlFor="expYear">Year</Label>
+          <Input
             id="expYear"
             type="text"
             maxLength={4}
             placeholder="YYYY"
             {...register('expYear')}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              errors.expYear ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={errors.expYear ? 'border-red-500' : ''}
           />
           {errors.expYear && (
             <p className="mt-1 text-sm text-red-600">{errors.expYear.message}</p>
@@ -154,18 +147,14 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({
         </div>
 
         <div>
-          <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 mb-1">
-            CVV
-          </label>
-          <input
+          <Label htmlFor="cvv">CVV</Label>
+          <Input
             id="cvv"
             type="text"
             maxLength={3}
             placeholder="123"
             {...register('cvv')}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              errors.cvv ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={errors.cvv ? 'border-red-500' : ''}
           />
           {errors.cvv && (
             <p className="mt-1 text-sm text-red-600">{errors.cvv.message}</p>
@@ -173,12 +162,9 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({
         </div>
       </div>
 
-      <button
-        type="submit"
-        className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-      >
+      <Button type="submit" className="w-full" size="lg">
         Continue
-      </button>
+      </Button>
     </form>
   );
 };

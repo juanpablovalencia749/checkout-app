@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
 import { formatCurrency, maskCardNumber } from '../../lib/utils';
+// ui
+import { Button } from '../ui/button';
+import { Card } from '../ui/card';
 import { BASE_FEE, DELIVERY_FEE } from '../../constants';
 import type { Product, Customer, DeliveryInfo, CreditCard } from '../../types';
 import { X, Loader2 } from 'lucide-react';
@@ -75,13 +78,14 @@ export const PaymentSummaryBackdrop: React.FC<PaymentSummaryBackdropProps> = ({
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-gray-900">Order Summary</h2>
               {!isProcessing && (
-                <button
+                <Button
                   onClick={onCancel}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  variant="ghost"
+                  size="icon"
                   aria-label="Close"
                 >
                   <X className="h-6 w-6" />
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -90,9 +94,9 @@ export const PaymentSummaryBackdrop: React.FC<PaymentSummaryBackdropProps> = ({
           <div className="px-6 py-6 max-h-[70vh] overflow-y-auto">
 
             {/* Product Info */}
-            <div className="mb-6">
+            <Card className="mb-6 bg-gray-50 p-4">
               <h3 className="text-sm font-semibold text-gray-700 mb-3">Product</h3>
-              <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg">
+              <div className="flex items-center space-x-4">
                 <div className="flex-1">
                   <p className="font-medium text-gray-900">{product.name}</p>
                   <p className="text-sm text-gray-600 mt-1">Quantity: {quantity}</p>
@@ -101,41 +105,41 @@ export const PaymentSummaryBackdrop: React.FC<PaymentSummaryBackdropProps> = ({
                   {formatCurrency(product.price * quantity)}
                 </p>
               </div>
-            </div>
+            </Card>
 
             {/* Customer Info */}
-            <div className="mb-6">
+            <Card className="mb-6 bg-gray-50 p-4">
               <h3 className="text-sm font-semibold text-gray-700 mb-3">Contact Information</h3>
-              <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-sm">
+              <div className="space-y-2 text-sm">
                 <p className="text-gray-900">{customer.fullName}</p>
                 <p className="text-gray-600">{customer.email}</p>
                 <p className="text-gray-600">{customer.phone}</p>
               </div>
-            </div>
+            </Card>
 
             {/* Delivery Info */}
-            <div className="mb-6">
+            <Card className="mb-6 bg-gray-50 p-4">
               <h3 className="text-sm font-semibold text-gray-700 mb-3">Delivery Address</h3>
-              <div className="bg-gray-50 p-4 rounded-lg text-sm">
+              <div className="text-sm">
                 <p className="text-gray-900">{delivery.address}</p>
                 <p className="text-gray-600 mt-1">{delivery.city}</p>
               </div>
-            </div>
+            </Card>
 
             {/* Payment Method */}
-            <div className="mb-6">
+            <Card className="mb-6 bg-gray-50 p-4">
               <h3 className="text-sm font-semibold text-gray-700 mb-3">Payment Method</h3>
-              <div className="bg-gray-50 p-4 rounded-lg">
+              <div>
                 <p className="text-sm text-gray-900">  {card?.number ? maskCardNumber(card.number) : '**** **** **** ****'}
 </p>
                 <p className="text-xs text-gray-600 mt-1">
                   Expires {card.exp_month.toString().padStart(2, '0')}/{card.exp_year}
                 </p>
               </div>
-            </div>
+            </Card>
 
             {/* Price Breakdown */}
-            <div className="border-t border-gray-200 pt-4">
+            <Card className="border-t border-gray-200 pt-4">
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
@@ -156,19 +160,17 @@ export const PaymentSummaryBackdrop: React.FC<PaymentSummaryBackdropProps> = ({
                   </span>
                 </div>
               </div>
-            </div>
+            </Card>
           </div>
 
           {/* Footer */}
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 sm:rounded-b-2xl">
-            <button
+            <Button
               onClick={onConfirm}
               disabled={isProcessing}
-              className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-                isProcessing
-                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                  : 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
-              }`}
+              className="w-full"
+              variant={isProcessing ? 'secondary' : 'default'}
+              size="lg"
             >
               {isProcessing ? (
                 <span className="flex items-center justify-center gap-2">
@@ -178,15 +180,16 @@ export const PaymentSummaryBackdrop: React.FC<PaymentSummaryBackdropProps> = ({
               ) : (
                 `Confirm & Pay ${formatCurrency(total)}`
               )}
-            </button>
+            </Button>
 
             {!isProcessing && (
-              <button
+              <Button
                 onClick={onCancel}
-                className="w-full mt-2 py-2 px-4 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                variant="ghost"
+                className="w-full mt-2"
               >
                 Cancel
-              </button>
+              </Button>
             )}
           </div>
         </div>

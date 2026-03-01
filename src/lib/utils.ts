@@ -1,5 +1,13 @@
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 import type { CardBrand } from '../types';
 import { CARD_PATTERNS } from '../constants';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+
 
 /**
  * Detect card brand based on card number

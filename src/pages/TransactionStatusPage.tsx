@@ -8,6 +8,8 @@ import {
   Package,
   User
 } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { Card } from '../components/ui/card';
 
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { fetchTransactionById } from '../features/transaction/transactionSlice';
@@ -111,7 +113,7 @@ export const TransactionStatusPage: React.FC<TransactionStatusPageProps> = ({
         <div className="space-y-6">
 
           {/* Transaction Card */}
-          <div className="bg-gray-50 rounded-2xl p-5">
+          <Card className="bg-gray-50 p-5 rounded-2xl">
             <div className="flex items-center gap-2 mb-4">
               <Receipt className="w-5 h-5 text-gray-600" />
               <h3 className="text-sm font-semibold text-gray-700">
@@ -152,11 +154,11 @@ export const TransactionStatusPage: React.FC<TransactionStatusPageProps> = ({
                 </span>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Product Card */}
           {currentTransaction.product && (
-            <div className="bg-gray-50 rounded-2xl p-5">
+            <Card className="bg-gray-50 p-5 rounded-2xl">
               <div className="flex items-center gap-2 mb-4">
                 <Package className="w-5 h-5 text-gray-600" />
                 <h3 className="text-sm font-semibold text-gray-700">
@@ -172,12 +174,12 @@ export const TransactionStatusPage: React.FC<TransactionStatusPageProps> = ({
                   Quantity: {currentTransaction.quantity}
                 </p>
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Customer Card */}
           {currentTransaction.customer && (
-            <div className="bg-gray-50 rounded-2xl p-5">
+            <Card className="bg-gray-50 p-5 rounded-2xl">
               <div className="flex items-center gap-2 mb-4">
                 <User className="w-5 h-5 text-gray-600" />
                 <h3 className="text-sm font-semibold text-gray-700">
@@ -196,8 +198,17 @@ export const TransactionStatusPage: React.FC<TransactionStatusPageProps> = ({
                   {currentTransaction.customer.phone}
                 </p>
               </div>
-            </div>
+            </Card>
           )}
+
+          <div className="mt-6">
+            <Button
+              onClick={() => window.location.replace('/')}
+              className="w-full"
+            >
+              Back to shop
+            </Button>
+          </div>
         </div>
       </div>
     </div>
