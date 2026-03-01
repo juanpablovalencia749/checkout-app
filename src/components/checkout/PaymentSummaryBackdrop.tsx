@@ -126,7 +126,8 @@ export const PaymentSummaryBackdrop: React.FC<PaymentSummaryBackdropProps> = ({
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-gray-700 mb-3">Payment Method</h3>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-900">{maskCardNumber(card.number)}</p>
+                <p className="text-sm text-gray-900">  {card?.number ? maskCardNumber(card.number) : '**** **** **** ****'}
+</p>
                 <p className="text-xs text-gray-600 mt-1">
                   Expires {card.exp_month.toString().padStart(2, '0')}/{card.exp_year}
                 </p>
